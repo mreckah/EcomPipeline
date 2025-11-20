@@ -1,0 +1,17 @@
+[2025-08-25T00:34:04.046+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ecommerce_health_check.check_data_freshness scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:34:04.120+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ecommerce_health_check.check_data_freshness scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:34:04.121+0000] {taskinstance.py:1361} INFO - Starting attempt 1 of 2
+[2025-08-25T00:34:04.253+0000] {taskinstance.py:1382} INFO - Executing <Task(PythonOperator): check_data_freshness> on 2025-08-25 00:15:00+00:00
+[2025-08-25T00:34:04.308+0000] {standard_task_runner.py:57} INFO - Started process 51 to run task
+[2025-08-25T00:34:04.349+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'ecommerce_health_check', 'check_data_freshness', 'scheduled__2025-08-25T00:15:00+00:00', '--job-id', '236', '--raw', '--subdir', 'DAGS_FOLDER/health_check_dag.py', '--cfg-path', '/tmp/tmpsin7fiph']
+[2025-08-25T00:34:04.355+0000] {standard_task_runner.py:85} INFO - Job 236: Subtask check_data_freshness
+[2025-08-25T00:34:04.838+0000] {task_command.py:416} INFO - Running <TaskInstance: ecommerce_health_check.check_data_freshness scheduled__2025-08-25T00:15:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-25T00:34:05.495+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ecommerce-team' AIRFLOW_CTX_DAG_ID='ecommerce_health_check' AIRFLOW_CTX_TASK_ID='check_data_freshness' AIRFLOW_CTX_EXECUTION_DATE='2025-08-25T00:15:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-25T00:15:00+00:00'
+[2025-08-25T00:34:05.497+0000] {logging_mixin.py:154} INFO - 📁 Data Freshness Check:
+[2025-08-25T00:34:05.497+0000] {logging_mixin.py:154} INFO - ========================================
+[2025-08-25T00:34:05.497+0000] {logging_mixin.py:154} INFO - sales.csv: ❌ File not found
+[2025-08-25T00:34:05.497+0000] {logging_mixin.py:154} INFO - sales_with_predictions.csv: ❌ File not found
+[2025-08-25T00:34:05.497+0000] {python.py:194} INFO - Done. Returned value was: {'./data/input/sales.csv': '❌ File not found', './data/output/sales_with_predictions.csv': '❌ File not found'}
+[2025-08-25T00:34:05.668+0000] {taskinstance.py:1400} INFO - Marking task as SUCCESS. dag_id=ecommerce_health_check, task_id=check_data_freshness, execution_date=20250825T001500, start_date=20250825T003404, end_date=20250825T003405
+[2025-08-25T00:34:05.818+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2025-08-25T00:34:05.876+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check

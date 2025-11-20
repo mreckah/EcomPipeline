@@ -1,0 +1,122 @@
+[2025-08-24T11:19:41.803+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T11:19:41.809+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T11:19:41.809+0000] {taskinstance.py:1361} INFO - Starting attempt 2 of 2
+[2025-08-24T11:19:41.818+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): run_pipeline_script> on 2025-08-23 00:00:00+00:00
+[2025-08-24T11:19:41.823+0000] {standard_task_runner.py:57} INFO - Started process 54 to run task
+[2025-08-24T11:19:41.826+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'pipeline_scheduler', 'run_pipeline_script', 'scheduled__2025-08-23T00:00:00+00:00', '--job-id', '140', '--raw', '--subdir', 'DAGS_FOLDER/scripts/pipeline_dag.py', '--cfg-path', '/tmp/tmpe1ytfpty']
+[2025-08-24T11:19:41.827+0000] {standard_task_runner.py:85} INFO - Job 140: Subtask run_pipeline_script
+[2025-08-24T11:19:41.871+0000] {task_command.py:416} INFO - Running <TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-24T11:19:41.928+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='oussama' AIRFLOW_CTX_DAG_ID='pipeline_scheduler' AIRFLOW_CTX_TASK_ID='run_pipeline_script' AIRFLOW_CTX_EXECUTION_DATE='2025-08-23T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-23T00:00:00+00:00'
+[2025-08-24T11:19:41.929+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-24T11:19:41.929+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'bash /opt/***/dags/scripts/pipeline.sh ']
+[2025-08-24T11:19:41.939+0000] {subprocess.py:86} INFO - Output:
+[2025-08-24T11:19:41.942+0000] {subprocess.py:93} INFO - ==> 1) Checking dataset exists: ./data/input/sales.csv
+[2025-08-24T11:19:41.942+0000] {subprocess.py:93} INFO - ERROR: ./data/input/sales.csv not found.
+[2025-08-24T11:19:41.942+0000] {subprocess.py:97} INFO - Command exited with return code 1
+[2025-08-24T11:19:41.953+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/bash.py", line 210, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 1.
+[2025-08-24T11:19:41.955+0000] {taskinstance.py:1400} INFO - Marking task as FAILED. dag_id=pipeline_scheduler, task_id=run_pipeline_script, execution_date=20250823T000000, start_date=20250824T111941, end_date=20250824T111941
+[2025-08-24T11:19:41.964+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 140 for task run_pipeline_script (Bash command failed. The command returned a non-zero exit code 1.; 54)
+[2025-08-24T11:19:41.998+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2025-08-24T11:19:42.013+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-08-24T12:27:35.060+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T12:27:35.071+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T12:27:35.071+0000] {taskinstance.py:1361} INFO - Starting attempt 2 of 2
+[2025-08-24T12:27:35.084+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): run_pipeline_script> on 2025-08-23 00:00:00+00:00
+[2025-08-24T12:27:35.092+0000] {standard_task_runner.py:57} INFO - Started process 123 to run task
+[2025-08-24T12:27:35.097+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'pipeline_scheduler', 'run_pipeline_script', 'scheduled__2025-08-23T00:00:00+00:00', '--job-id', '167', '--raw', '--subdir', 'DAGS_FOLDER/pipeline_dag.py', '--cfg-path', '/tmp/tmp_3d17hky']
+[2025-08-24T12:27:35.098+0000] {standard_task_runner.py:85} INFO - Job 167: Subtask run_pipeline_script
+[2025-08-24T12:27:35.160+0000] {task_command.py:416} INFO - Running <TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-24T12:27:35.257+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='oussama' AIRFLOW_CTX_DAG_ID='pipeline_scheduler' AIRFLOW_CTX_TASK_ID='run_pipeline_script' AIRFLOW_CTX_EXECUTION_DATE='2025-08-23T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-23T00:00:00+00:00'
+[2025-08-24T12:27:35.258+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-24T12:27:35.261+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'bash /workspaces/EcomPipiline/dags/scripts/pipeline.sh ']
+[2025-08-24T12:27:35.274+0000] {subprocess.py:86} INFO - Output:
+[2025-08-24T12:27:35.279+0000] {subprocess.py:93} INFO - bash: /workspaces/EcomPipiline/dags/scripts/pipeline.sh: No such file or directory
+[2025-08-24T12:27:35.279+0000] {subprocess.py:97} INFO - Command exited with return code 127
+[2025-08-24T12:27:35.295+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/bash.py", line 210, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 127.
+[2025-08-24T12:27:35.298+0000] {taskinstance.py:1400} INFO - Marking task as FAILED. dag_id=pipeline_scheduler, task_id=run_pipeline_script, execution_date=20250823T000000, start_date=20250824T122735, end_date=20250824T122735
+[2025-08-24T12:27:35.309+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 167 for task run_pipeline_script (Bash command failed. The command returned a non-zero exit code 127.; 123)
+[2025-08-24T12:27:35.353+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2025-08-24T12:27:35.374+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-08-24T12:50:59.119+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T12:50:59.142+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T12:50:59.142+0000] {taskinstance.py:1361} INFO - Starting attempt 2 of 2
+[2025-08-24T12:50:59.151+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): run_pipeline_script> on 2025-08-23 00:00:00+00:00
+[2025-08-24T12:50:59.155+0000] {standard_task_runner.py:57} INFO - Started process 144 to run task
+[2025-08-24T12:50:59.158+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'pipeline_scheduler', 'run_pipeline_script', 'scheduled__2025-08-23T00:00:00+00:00', '--job-id', '176', '--raw', '--subdir', 'DAGS_FOLDER/pipeline_dag.py', '--cfg-path', '/tmp/tmps8lgjuje']
+[2025-08-24T12:50:59.159+0000] {standard_task_runner.py:85} INFO - Job 176: Subtask run_pipeline_script
+[2025-08-24T12:50:59.200+0000] {task_command.py:416} INFO - Running <TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-24T12:50:59.259+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='oussama' AIRFLOW_CTX_DAG_ID='pipeline_scheduler' AIRFLOW_CTX_TASK_ID='run_pipeline_script' AIRFLOW_CTX_EXECUTION_DATE='2025-08-23T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-23T00:00:00+00:00'
+[2025-08-24T12:50:59.260+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-24T12:50:59.262+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', 'bash /workspaces/EcomPipiline/dags/scripts/pipeline.sh ']
+[2025-08-24T12:50:59.270+0000] {subprocess.py:86} INFO - Output:
+[2025-08-24T12:50:59.274+0000] {subprocess.py:93} INFO - bash: /workspaces/EcomPipiline/dags/scripts/pipeline.sh: No such file or directory
+[2025-08-24T12:50:59.274+0000] {subprocess.py:97} INFO - Command exited with return code 127
+[2025-08-24T12:50:59.283+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/bash.py", line 210, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 127.
+[2025-08-24T12:50:59.285+0000] {taskinstance.py:1400} INFO - Marking task as FAILED. dag_id=pipeline_scheduler, task_id=run_pipeline_script, execution_date=20250823T000000, start_date=20250824T125059, end_date=20250824T125059
+[2025-08-24T12:50:59.294+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 176 for task run_pipeline_script (Bash command failed. The command returned a non-zero exit code 127.; 144)
+[2025-08-24T12:50:59.330+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2025-08-24T12:50:59.345+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-08-24T13:34:07.162+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T13:34:07.172+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [queued]>
+[2025-08-24T13:34:07.172+0000] {taskinstance.py:1361} INFO - Starting attempt 2 of 2
+[2025-08-24T13:34:07.181+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): run_pipeline_script> on 2025-08-23 00:00:00+00:00
+[2025-08-24T13:34:07.186+0000] {standard_task_runner.py:57} INFO - Started process 159 to run task
+[2025-08-24T13:34:07.189+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'pipeline_scheduler', 'run_pipeline_script', 'scheduled__2025-08-23T00:00:00+00:00', '--job-id', '182', '--raw', '--subdir', 'DAGS_FOLDER/scripts/pipeline_dag.py', '--cfg-path', '/tmp/tmpyx4idjlv']
+[2025-08-24T13:34:07.190+0000] {standard_task_runner.py:85} INFO - Job 182: Subtask run_pipeline_script
+[2025-08-24T13:34:07.233+0000] {task_command.py:416} INFO - Running <TaskInstance: pipeline_scheduler.run_pipeline_script scheduled__2025-08-23T00:00:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-24T13:34:07.264+0000] {abstractoperator.py:709} ERROR - Exception rendering Jinja template for task 'run_pipeline_script', field 'bash_command'. Template: '/opt/***/dags/scripts/pipeline.sh'
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/abstractoperator.py", line 701, in _do_render_template_fields
+    rendered_content = self.render_template(
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/template/templater.py", line 152, in render_template
+    template = jinja_env.get_template(value)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/loaders.py", line 218, in get_source
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: /opt/airflow/dags/scripts/pipeline.sh
+[2025-08-24T13:34:07.265+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 1518, in _run_raw_task
+    self._execute_task_with_callbacks(context, test_mode, session=session)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 1647, in _execute_task_with_callbacks
+    task_orig = self.render_templates(context=context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 2285, in render_templates
+    original_task.render_template_fields(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/baseoperator.py", line 1243, in render_template_fields
+    self._do_render_template_fields(self, self.template_fields, context, jinja_env, set())
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/utils/session.py", line 79, in wrapper
+    return func(*args, session=session, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/abstractoperator.py", line 701, in _do_render_template_fields
+    rendered_content = self.render_template(
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/template/templater.py", line 152, in render_template
+    template = jinja_env.get_template(value)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/environment.py", line 1010, in get_template
+    return self._load_template(name, globals)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/environment.py", line 969, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+  File "/home/airflow/.local/lib/python3.8/site-packages/jinja2/loaders.py", line 218, in get_source
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: /opt/airflow/dags/scripts/pipeline.sh
+[2025-08-24T13:34:07.273+0000] {taskinstance.py:1400} INFO - Marking task as FAILED. dag_id=pipeline_scheduler, task_id=run_pipeline_script, execution_date=20250823T000000, start_date=20250824T133407, end_date=20250824T133407
+[2025-08-24T13:34:07.280+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 182 for task run_pipeline_script (/opt/airflow/dags/scripts/pipeline.sh; 159)
+[2025-08-24T13:34:07.322+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2025-08-24T13:34:07.336+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check

@@ -1,0 +1,30 @@
+[2025-08-25T00:36:12.490+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ecommerce_health_check.generate_health_report scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:36:12.504+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ecommerce_health_check.generate_health_report scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:36:12.504+0000] {taskinstance.py:1361} INFO - Starting attempt 1 of 2
+[2025-08-25T00:36:12.523+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): generate_health_report> on 2025-08-25 00:15:00+00:00
+[2025-08-25T00:36:12.533+0000] {standard_task_runner.py:57} INFO - Started process 83 to run task
+[2025-08-25T00:36:12.540+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'ecommerce_health_check', 'generate_health_report', 'scheduled__2025-08-25T00:15:00+00:00', '--job-id', '241', '--raw', '--subdir', 'DAGS_FOLDER/health_check_dag.py', '--cfg-path', '/tmp/tmpo0w08f7l']
+[2025-08-25T00:36:12.543+0000] {standard_task_runner.py:85} INFO - Job 241: Subtask generate_health_report
+[2025-08-25T00:36:12.699+0000] {task_command.py:416} INFO - Running <TaskInstance: ecommerce_health_check.generate_health_report scheduled__2025-08-25T00:15:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-25T00:36:13.220+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ecommerce-team' AIRFLOW_CTX_DAG_ID='ecommerce_health_check' AIRFLOW_CTX_TASK_ID='generate_health_report' AIRFLOW_CTX_EXECUTION_DATE='2025-08-25T00:15:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-25T00:15:00+00:00'
+[2025-08-25T00:36:13.223+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-25T00:36:13.224+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', '\n    REPORT_FILE="./logs/health_report_$(date +%Y%m%d_%H%M).txt"\n    \n    echo "ECommerce Pipeline Health Report" > "$REPORT_FILE"\n    echo "Generated: $(date)" >> "$REPORT_FILE"\n    echo "=================================" >> "$REPORT_FILE"\n    echo "" >> "$REPORT_FILE"\n    \n    echo "✅ Health check completed successfully" >> "$REPORT_FILE"\n    echo "📊 All critical services are operational" >> "$REPORT_FILE"\n    echo "🔄 Next scheduled pipeline run: Daily at 2:00 AM" >> "$REPORT_FILE"\n    echo "" >> "$REPORT_FILE"\n    \n    echo "📈 Quick Stats:" >> "$REPORT_FILE"\n    echo "- Airflow DAGs: $(ls dags/*.py | wc -l)" >> "$REPORT_FILE"\n    echo "- Log files: $(ls logs/*.log 2>/dev/null | wc -l)" >> "$REPORT_FILE"\n    echo "- Data files: $(ls data/input/*.csv data/output/*.csv 2>/dev/null | wc -l)" >> "$REPORT_FILE"\n    \n    echo "Health report saved: $REPORT_FILE"\n    ']
+[2025-08-25T00:36:13.246+0000] {subprocess.py:86} INFO - Output:
+[2025-08-25T00:36:13.403+0000] {subprocess.py:93} INFO - /bin/bash: line 4: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.416+0000] {subprocess.py:93} INFO - /bin/bash: line 5: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 6: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 7: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 9: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 10: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 11: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 12: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.417+0000] {subprocess.py:93} INFO - /bin/bash: line 14: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.524+0000] {subprocess.py:93} INFO - ls: cannot access 'dags/*.py': No such file or directory
+[2025-08-25T00:36:13.527+0000] {subprocess.py:93} INFO - /bin/bash: line 15: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.533+0000] {subprocess.py:93} INFO - /bin/bash: line 16: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.539+0000] {subprocess.py:93} INFO - /bin/bash: line 17: ./logs/health_report_20250825_0036.txt: No such file or directory
+[2025-08-25T00:36:13.540+0000] {subprocess.py:93} INFO - Health report saved: ./logs/health_report_20250825_0036.txt
+[2025-08-25T00:36:13.540+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2025-08-25T00:36:13.594+0000] {taskinstance.py:1400} INFO - Marking task as SUCCESS. dag_id=ecommerce_health_check, task_id=generate_health_report, execution_date=20250825T001500, start_date=20250825T003612, end_date=20250825T003613
+[2025-08-25T00:36:13.655+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2025-08-25T00:36:13.711+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check

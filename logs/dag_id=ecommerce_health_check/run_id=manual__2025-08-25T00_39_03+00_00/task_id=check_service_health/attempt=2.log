@@ -1,0 +1,29 @@
+[2025-08-25T00:41:07.381+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ecommerce_health_check.check_service_health manual__2025-08-25T00:39:03+00:00 [queued]>
+[2025-08-25T00:41:07.388+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ecommerce_health_check.check_service_health manual__2025-08-25T00:39:03+00:00 [queued]>
+[2025-08-25T00:41:07.388+0000] {taskinstance.py:1361} INFO - Starting attempt 2 of 2
+[2025-08-25T00:41:07.397+0000] {taskinstance.py:1382} INFO - Executing <Task(PythonOperator): check_service_health> on 2025-08-25 00:39:03+00:00
+[2025-08-25T00:41:07.402+0000] {standard_task_runner.py:57} INFO - Started process 126 to run task
+[2025-08-25T00:41:07.405+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'ecommerce_health_check', 'check_service_health', 'manual__2025-08-25T00:39:03+00:00', '--job-id', '247', '--raw', '--subdir', 'DAGS_FOLDER/health_check_dag.py', '--cfg-path', '/tmp/tmpxa9woawt']
+[2025-08-25T00:41:07.406+0000] {standard_task_runner.py:85} INFO - Job 247: Subtask check_service_health
+[2025-08-25T00:41:07.448+0000] {task_command.py:416} INFO - Running <TaskInstance: ecommerce_health_check.check_service_health manual__2025-08-25T00:39:03+00:00 [running]> on host 88d490cfafa3
+[2025-08-25T00:41:07.519+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ecommerce-team' AIRFLOW_CTX_DAG_ID='ecommerce_health_check' AIRFLOW_CTX_TASK_ID='check_service_health' AIRFLOW_CTX_EXECUTION_DATE='2025-08-25T00:39:03+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-25T00:39:03+00:00'
+[2025-08-25T00:41:07.577+0000] {logging_mixin.py:154} INFO - 🏥 Service Health Check Results:
+[2025-08-25T00:41:07.578+0000] {logging_mixin.py:154} INFO - ========================================
+[2025-08-25T00:41:07.578+0000] {logging_mixin.py:154} INFO - HDFS NameNode: ❌ Unreachable: HTTPConnectionPool(host='localhost', port=9870): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff261a11c10>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[2025-08-25T00:41:07.578+0000] {logging_mixin.py:154} INFO - Spark Master: ❌ Unreachable: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff2619a3970>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[2025-08-25T00:41:07.579+0000] {logging_mixin.py:154} INFO - Grafana: ❌ Unreachable: HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff2619c62b0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[2025-08-25T00:41:07.579+0000] {logging_mixin.py:154} INFO - Airflow: ❌ Unreachable: HTTPConnectionPool(host='localhost', port=8081): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff2619a3460>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[2025-08-25T00:41:07.579+0000] {logging_mixin.py:154} INFO - Docker: ❌ Docker command failed
+[2025-08-25T00:41:07.579+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/health_check_dag.py", line 74, in check_service_health
+    raise Exception(f"Critical services are down: {failed_critical}")
+Exception: Critical services are down: ['HDFS NameNode', 'Spark Master']
+[2025-08-25T00:41:07.589+0000] {taskinstance.py:1400} INFO - Marking task as FAILED. dag_id=ecommerce_health_check, task_id=check_service_health, execution_date=20250825T003903, start_date=20250825T004107, end_date=20250825T004107
+[2025-08-25T00:41:07.598+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 247 for task check_service_health (Critical services are down: ['HDFS NameNode', 'Spark Master']; 126)
+[2025-08-25T00:41:07.618+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2025-08-25T00:41:07.636+0000] {taskinstance.py:2778} INFO - 1 downstream tasks scheduled from follow-on schedule check

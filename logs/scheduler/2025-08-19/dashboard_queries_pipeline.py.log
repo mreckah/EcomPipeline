@@ -1,0 +1,71 @@
+[2025-08-19T18:03:25.417+0000] {processor.py:157} INFO - Started process (PID=43) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:25.420+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:03:25.423+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:25.423+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:25.712+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:28.003+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.002+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:03:28.050+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.050+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:03:28.074+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.073+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:03:28.074+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.074+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:03:28.112+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.112+0000] {dag.py:2963} INFO - Creating ORM DAG for dashboard_queries_pipeline
+[2025-08-19T18:03:28.161+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:28.160+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:03:28.191+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 2.786 seconds
+[2025-08-19T18:03:58.389+0000] {processor.py:157} INFO - Started process (PID=52) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:58.392+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:03:58.395+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:58.394+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:58.432+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:03:58.734+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:58.734+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:03:58.762+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:03:58.762+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:03:58.778+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.393 seconds
+[2025-08-19T18:04:28.951+0000] {processor.py:157} INFO - Started process (PID=61) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:28.951+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:04:28.953+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:28.953+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:29.008+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:29.040+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:29.039+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:04:29.063+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:29.063+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:04:29.077+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.130 seconds
+[2025-08-19T18:04:59.184+0000] {processor.py:157} INFO - Started process (PID=70) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:59.186+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:04:59.189+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:59.188+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:59.232+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:04:59.321+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:59.321+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:04:59.388+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:04:59.388+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:04:59.419+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.239 seconds
+[2025-08-19T18:05:29.623+0000] {processor.py:157} INFO - Started process (PID=71) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:05:29.625+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:05:29.628+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:05:29.627+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:05:29.682+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:05:29.733+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:05:29.732+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:05:29.784+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:05:29.783+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:05:29.808+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.197 seconds
+[2025-08-19T18:06:00.050+0000] {processor.py:157} INFO - Started process (PID=80) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:00.052+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:06:00.058+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:00.057+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:00.097+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:00.168+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:00.167+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:06:00.221+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:00.220+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:06:00.265+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.221 seconds
+[2025-08-19T18:06:30.527+0000] {processor.py:157} INFO - Started process (PID=89) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:30.530+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:06:30.535+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:30.535+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:30.571+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:06:30.657+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:30.656+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:06:30.725+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:06:30.724+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:06:30.765+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.243 seconds
+[2025-08-19T18:07:01.020+0000] {processor.py:157} INFO - Started process (PID=97) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:01.021+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:07:01.023+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:01.022+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:01.036+0000] {processor.py:839} INFO - DAG(s) dict_keys(['dashboard_queries_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:01.058+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:01.058+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:07:01.080+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:01.080+0000] {dag.py:3722} INFO - Setting next_dagrun for dashboard_queries_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:07:01.095+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.078 seconds
+[2025-08-19T18:07:09.083+0000] {processor.py:157} INFO - Started process (PID=98) to work on /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:09.084+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/dashboard_queries_pipeline.py for tasks to queue
+[2025-08-19T18:07:09.086+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.086+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:09.101+0000] {processor.py:839} INFO - DAG(s) dict_keys(['ecom_pipeline']) retrieved from /opt/airflow/dags/dashboard_queries_pipeline.py
+[2025-08-19T18:07:09.424+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.424+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:07:09.431+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.431+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:07:09.436+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.436+0000] {manager.py:499} INFO - Created Permission View: %s
+[2025-08-19T18:07:09.436+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.436+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2025-08-19T18:07:09.444+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.444+0000] {dag.py:2963} INFO - Creating ORM DAG for ecom_pipeline
+[2025-08-19T18:07:09.452+0000] {logging_mixin.py:154} INFO - [2025-08-19T18:07:09.452+0000] {dag.py:3722} INFO - Setting next_dagrun for ecom_pipeline to 2025-08-18T00:00:00+00:00, run_after=2025-08-19T00:00:00+00:00
+[2025-08-19T18:07:09.480+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/dashboard_queries_pipeline.py took 0.401 seconds

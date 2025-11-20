@@ -1,0 +1,27 @@
+[2025-08-25T00:34:04.041+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: ecommerce_health_check.check_disk_space scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:34:04.117+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: ecommerce_health_check.check_disk_space scheduled__2025-08-25T00:15:00+00:00 [queued]>
+[2025-08-25T00:34:04.117+0000] {taskinstance.py:1361} INFO - Starting attempt 1 of 2
+[2025-08-25T00:34:04.227+0000] {taskinstance.py:1382} INFO - Executing <Task(BashOperator): check_disk_space> on 2025-08-25 00:15:00+00:00
+[2025-08-25T00:34:04.243+0000] {standard_task_runner.py:57} INFO - Started process 50 to run task
+[2025-08-25T00:34:04.273+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'ecommerce_health_check', 'check_disk_space', 'scheduled__2025-08-25T00:15:00+00:00', '--job-id', '238', '--raw', '--subdir', 'DAGS_FOLDER/health_check_dag.py', '--cfg-path', '/tmp/tmpdl70_3ww']
+[2025-08-25T00:34:04.293+0000] {standard_task_runner.py:85} INFO - Job 238: Subtask check_disk_space
+[2025-08-25T00:34:04.821+0000] {task_command.py:416} INFO - Running <TaskInstance: ecommerce_health_check.check_disk_space scheduled__2025-08-25T00:15:00+00:00 [running]> on host 88d490cfafa3
+[2025-08-25T00:34:05.492+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ecommerce-team' AIRFLOW_CTX_DAG_ID='ecommerce_health_check' AIRFLOW_CTX_TASK_ID='check_disk_space' AIRFLOW_CTX_EXECUTION_DATE='2025-08-25T00:15:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-08-25T00:15:00+00:00'
+[2025-08-25T00:34:05.654+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-08-25T00:34:05.661+0000] {subprocess.py:75} INFO - Running command: ['/bin/bash', '-c', '\n    echo "💾 Disk Space Check"\n    echo "=================="\n    \n    # Check available disk space\n    df -h | grep -E "(Filesystem|/dev/)" | head -2\n    \n    # Check Docker volumes\n    echo ""\n    echo "🐳 Docker Volume Usage:"\n    docker system df\n    \n    # Check specific directories\n    echo ""\n    echo "📁 Project Directory Usage:"\n    du -sh ./data ./logs ./models 2>/dev/null || echo "Some directories not found"\n    \n    # Alert if disk space is low (less than 1GB free)\n    AVAILABLE_KB=$(df . | tail -1 | awk \'{print $4}\')\n    AVAILABLE_GB=$((AVAILABLE_KB / 1024 / 1024))\n    \n    if [[ $AVAILABLE_GB -lt 1 ]]; then\n        echo "⚠️  WARNING: Low disk space - ${AVAILABLE_GB}GB available"\n    else\n        echo "✅ Disk space OK - ${AVAILABLE_GB}GB available"\n    fi\n    ']
+[2025-08-25T00:34:05.771+0000] {subprocess.py:86} INFO - Output:
+[2025-08-25T00:34:05.837+0000] {subprocess.py:93} INFO - 💾 Disk Space Check
+[2025-08-25T00:34:05.839+0000] {subprocess.py:93} INFO - ==================
+[2025-08-25T00:34:06.481+0000] {subprocess.py:93} INFO - Filesystem      Size  Used Avail Use% Mounted on
+[2025-08-25T00:34:06.482+0000] {subprocess.py:93} INFO - shm              64M   64K   64M   1% /dev/shm
+[2025-08-25T00:34:06.490+0000] {subprocess.py:93} INFO - 
+[2025-08-25T00:34:06.490+0000] {subprocess.py:93} INFO - 🐳 Docker Volume Usage:
+[2025-08-25T00:34:08.660+0000] {subprocess.py:93} INFO - Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+[2025-08-25T00:34:08.661+0000] {subprocess.py:93} INFO - 
+[2025-08-25T00:34:08.661+0000] {subprocess.py:93} INFO - 📁 Project Directory Usage:
+[2025-08-25T00:34:08.801+0000] {subprocess.py:93} INFO - Some directories not found
+[2025-08-25T00:34:09.369+0000] {subprocess.py:93} INFO - ✅ Disk space OK - 4GB available
+[2025-08-25T00:34:09.370+0000] {subprocess.py:97} INFO - Command exited with return code 0
+[2025-08-25T00:34:09.404+0000] {taskinstance.py:1400} INFO - Marking task as SUCCESS. dag_id=ecommerce_health_check, task_id=check_disk_space, execution_date=20250825T001500, start_date=20250825T003404, end_date=20250825T003409
+[2025-08-25T00:34:09.437+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2025-08-25T00:34:09.465+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check
