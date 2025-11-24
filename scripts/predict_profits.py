@@ -1,134 +1,158 @@
 #!/usr/bin/env python3
 import os
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import IsolationForest
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from xgboost import XGBRegressor, plot_importance
 import matplotlib.pyplot as plt
-import seaborn as sns
+import joblib
 
-# ---------------------- PostgreSQL config ----------------------
+# ---------------------- Config ----------------------
 PG_USER = "warehouse_user"
 PG_PASS = "warehouse_pass"
 PG_HOST = "localhost"
 PG_PORT = "5433"
-PG_DB   = "warehouse"
+PG_DB = "warehouse"
 TABLE_INPUT  = "sales_data"
 TABLE_OUTPUT = "sales_with_predictions"
 
+MODEL_DIR = "./models"
+PLOTS_DIR = "./plots"
+os.makedirs(MODEL_DIR, exist_ok=True)
+os.makedirs(PLOTS_DIR, exist_ok=True)
+
 engine = create_engine(f"postgresql+psycopg2://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB}")
 
-# Ensure plot folder exists
-os.makedirs("./plots", exist_ok=True)
+# ---------------------- Helpers ----------------------
+def parse_number_mixed(s):
+    if pd.isna(s):
+        return np.nan
+    if isinstance(s, (int, float)):
+        return float(s)
+    s = str(s).replace("$","").replace("(","").replace(")","").replace(" ","")
+    if '.' in s and ',' in s and s.rfind(',') > s.rfind('.'):
+        s = s.replace('.','').replace(',','.')
+    elif ',' in s and s.count(',') == 1 and len(s.split(',')[1]) <= 3:
+        s = s.replace(',','.')
+    else:
+        s = s.replace(',','')
+    try:
+        return float(s)
+    except:
+        return np.nan
+
+def parse_discount(x):
+    if pd.isna(x):
+        return np.nan
+    if isinstance(x,(int,float)):
+        if 0 < x <= 1:
+            return x
+        elif 1 < x <= 100:
+            return x/100
+        elif x==0:
+            return 0
+        else:
+            return x
+    s = str(x).replace("%","").strip()
+    try:
+        val = float(s)
+        if 0 < val <= 1:
+            return val
+        elif 1 < val <= 100:
+            return val/100
+        elif val==0:
+            return 0
+        else:
+            return val
+    except:
+        return np.nan
 
 # ---------------------- Load dataset ----------------------
-print("V Loading data from PostgreSQL...")
+print("✓ Loading data from PostgreSQL...")
 df = pd.read_sql(f"SELECT * FROM {TABLE_INPUT}", con=engine)
-print(f"V Loaded {len(df)} rows")
+print(f"✓ Loaded {len(df)} rows")
 
-# ---------------------- Clean dataset ----------------------
-print("V Cleaning data...")
+# ---------------------- Clean numeric columns ----------------------
+df["Sales"] = df["Sales"].apply(parse_number_mixed)
+df["Profit"] = df["Profit"].apply(parse_number_mixed)
+df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
+df["Discount"] = df["Discount"].apply(parse_discount)
+df["Order_Month"] = pd.to_datetime(df["Order Date"], errors="coerce").dt.month
 
-# Check what columns actually exist (case-insensitive)
-df_columns_lower = {col.lower(): col for col in df.columns}
-required_cols = {}
+df = df.dropna(subset=["Sales","Profit","Quantity","Discount","Order_Month"])
+df = df[df["Sales"] > 0]
+print(f"✓ Cleaned dataset: {len(df)} rows")
 
-# Map required columns to actual column names
-for req_col in ["Sales", "Profit", "Quantity", "Discount"]:
-    if req_col.lower() in df_columns_lower:
-        required_cols[req_col] = df_columns_lower[req_col.lower()]
-    else:
-        print(f"⚠️  Warning: Column '{req_col}' not found in dataset. Available columns: {list(df.columns)}")
-        # Try to find similar column names
-        similar = [c for c in df.columns if req_col.lower() in c.lower() or c.lower() in req_col.lower()]
-        if similar:
-            print(f"   Found similar columns: {similar}")
+# ---------------------- Encode categoricals ----------------------
+categoricals = ["Ship Mode","Segment","Category","Sub-Category","Region"]
+encoders = {}
+for col in categoricals:
+    le = LabelEncoder()
+    df[col+"_Encoded"] = le.fit_transform(df[col].astype(str))
+    encoders[col] = le
 
-# Clean numeric columns
-for col_name, actual_col in required_cols.items():
-    if col_name in ["Sales", "Profit"]:
-        df[actual_col] = df[actual_col].replace(r'[\$,()]', '', regex=True).astype(float)
-    elif col_name == "Discount":
-        df[actual_col] = pd.to_numeric(df[actual_col].astype(str).str.replace("%",""), errors="coerce") / 100
-    elif col_name == "Quantity":
-        df[actual_col] = pd.to_numeric(df[actual_col], errors="coerce")
+# ---------------------- Features ----------------------
+features = [
+    "Sales","Quantity","Discount","Order_Month",
+    "Ship Mode_Encoded","Segment_Encoded","Category_Encoded","Sub-Category_Encoded","Region_Encoded"
+]
 
-# Use actual column names for features
-features = [required_cols.get("Sales"), required_cols.get("Quantity"), required_cols.get("Discount")]
-features = [f for f in features if f is not None]  # Remove None values
-profit_col = required_cols.get("Profit")
+df = df.dropna(subset=features)
 
-if not features or profit_col is None:
-    print(f"❌ ERROR: Missing required columns. Need: Sales, Quantity, Discount, Profit")
-    print(f"   Available columns: {list(df.columns)}")
-    exit(1)
-
-# Drop rows with missing values in required columns
-df = df.dropna(subset=features + [profit_col])
-print(f"V Dataset cleaned, {len(df)} rows ready for modeling")
-
-# ---------------------- Anomaly detection ----------------------
-print("V Detecting anomalies with Isolation Forest...")
-iso = IsolationForest(contamination=0.05, random_state=42)
+# ---------------------- Optional anomaly removal ----------------------
+iso = IsolationForest(contamination=0.03, random_state=42)
 df['anomaly'] = iso.fit_predict(df[features])
-num_anomalies = sum(df['anomaly'] == -1)
-print(f"V Found {num_anomalies} anomalies out of {len(df)} rows")
-
-# ---------------------- Train regression ----------------------
 df_clean = df[df['anomaly'] != -1].copy()
-X_train = df_clean[features]
-y_train = df_clean[profit_col]
+print(f"✓ Clean rows after anomaly removal: {len(df_clean)}")
 
-print("V Training Linear Regression model...")
-model = LinearRegression()
-model.fit(X_train, y_train)
-df_clean["Predicted_Profit"] = model.predict(X_train)
+# ---------------------- Train/Test split ----------------------
+X = df_clean[features]
+y = df_clean["Profit"]
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
 
-rmse = mean_squared_error(y_train, df_clean["Predicted_Profit"], squared=False)
-print(f"V Test RMSE: {rmse:.2f}")
+# ---------------------- Hyperparameter tuning & training ----------------------
+param_grid = {
+    "n_estimators": [300,500,700],
+    "max_depth":[3,5,7],
+    "learning_rate":[0.01,0.05,0.1],
+    "subsample":[0.6,0.8,1.0],
+    "colsample_bytree":[0.6,0.8,1.0]
+}
+
+xgb = XGBRegressor(random_state=42,n_jobs=-1,objective="reg:squarederror")
+search = RandomizedSearchCV(xgb,param_distributions=param_grid,n_iter=20,scoring="r2",cv=3,verbose=1,random_state=42)
+search.fit(X_train,y_train)
+best_model = search.best_estimator_
+print("✓ Best parameters:", search.best_params_)
+
+# ---------------------- Evaluation ----------------------
+y_pred_test = best_model.predict(X_test)
+rmse_test = mean_squared_error(y_test,y_pred_test,squared=False)
+r2_test   = r2_score(y_test,y_pred_test)
+print(f"✓ Test RMSE: {rmse_test:.2f}")
+print(f"✓ Test R²: {r2_test:.3f}")
+
+# ---------------------- Save model & metadata ----------------------
+joblib.dump(best_model, os.path.join(MODEL_DIR,"xgb_model.pkl"))
+joblib.dump(encoders, os.path.join(MODEL_DIR,"encoders.pkl"))
+joblib.dump(features, os.path.join(MODEL_DIR,"feature_list.pkl"))
+print("✓ Model, encoders, features saved")
 
 # ---------------------- Save predictions ----------------------
-print(f"V Saving predictions to PostgreSQL table '{TABLE_OUTPUT}'...")
-df_clean.to_sql(TABLE_OUTPUT, con=engine, if_exists="replace", index=False)
-print("V Predictions saved successfully")
+df_test = X_test.copy()
+df_test["Actual_Profit"] = y_test
+df_test["Predicted_Profit"] = y_pred_test
+df_test.to_sql(TABLE_OUTPUT, con=engine, if_exists="replace", index=False)
 
-# ---------------------- Visualization ----------------------
-print("V Generating plots...")
+# ---------------------- Plots ----------------------
+plt.figure(figsize=(12,8))
+plot_importance(best_model, importance_type='gain', max_num_features=10)
+plt.tight_layout()
+plt.savefig(os.path.join(PLOTS_DIR,"feature_importance.png"))
+plt.close()
 
-# Sales vs Profit
-sales_col = required_cols.get("Sales")
-discount_col = required_cols.get("Discount")
-
-if sales_col and profit_col:
-    plt.figure(figsize=(10,6))
-    sns.scatterplot(
-        data=df, x=sales_col, y=profit_col,
-        hue=df['anomaly'].map({1:'Normal', -1:'Anomaly'}),
-        palette={'Normal':'blue','Anomaly':'red'},
-        s=80
-    )
-    plt.title("V Sales vs Profit (Red = Anomaly)")
-    plt.xlabel("Sales")
-    plt.ylabel("Profit")
-    plt.tight_layout()
-    plt.savefig("./plots/sales_vs_profit.png")
-    plt.close()
-
-# Profit vs Discount
-if discount_col and profit_col:
-    plt.figure(figsize=(10,6))
-    sns.scatterplot(
-        data=df, x=discount_col, y=profit_col,
-        hue=df['anomaly'].map({1:'Normal', -1:'Anomaly'}),
-        palette={'Normal':'blue','Anomaly':'red'},
-        s=80
-    )
-    plt.title("V Discount vs Profit (Red = Anomaly)")
-    plt.xlabel("Discount")
-    plt.ylabel("Profit")
-    plt.tight_layout()
-    plt.savefig("./plots/discount_vs_profit.png")
-    plt.close()
-
-print("V Plots saved in './plots/' folder")
+print("✓ Training pipeline complete")

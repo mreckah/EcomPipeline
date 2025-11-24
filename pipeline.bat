@@ -13,7 +13,7 @@ set NIFI_PROCESS_GROUP_ID=d260d54e-0198-1000-2efb-5494af2dbccf
 
 set SPARK_MASTER_CONTAINER=spark-master
 set SPARK_APP_DIR=/opt/bitnami/spark/app
-set SPARK_APP_PATH=%SPARK_APP_DIR%/marketing_job.py
+set SPARK_APP_PATH=%SPARK_APP_DIR%/gold_layer.py
 set SPARK_MASTER_URL=spark://spark-master:7077
 
 set NAMENODE_CONTAINER=namenode
@@ -111,7 +111,7 @@ exit /b 1
 
 echo == 6) Copy Spark job and run it ==
 docker exec %SPARK_MASTER_CONTAINER% mkdir -p "%SPARK_APP_DIR%/libs"
-docker cp ".\scripts\marketing_job.py" "%SPARK_MASTER_CONTAINER%:%SPARK_APP_PATH%"
+docker cp ".\scripts\gold_layer.py" "%SPARK_MASTER_CONTAINER%:%SPARK_APP_PATH%"
 docker cp ".\libs\postgresql-42.6.0.jar" "%SPARK_MASTER_CONTAINER%:%SPARK_APP_DIR%/libs/postgresql-42.6.0.jar"
 
 docker exec %SPARK_MASTER_CONTAINER% ^
@@ -128,4 +128,8 @@ curl -sS -u %GRAFANA_USER%:%GRAFANA_PASS% -X POST "%GRAFANA_URL%/api/admin/provi
 curl -sS -u %GRAFANA_USER%:%GRAFANA_PASS% -X POST "%GRAFANA_URL%/api/admin/provisioning/dashboards/reload" >nul 2>&1
 
 echo ✅ Pipeline finished successfully.
+echo == 9) Run Streamlit App ==
+streamlit run .\scripts\streamlit_app.py
+
 pause
+

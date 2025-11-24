@@ -1,8 +1,8 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, regexp_replace, to_date, when, lit, concat_ws, array, count as spark_count, min as spark_min, max as spark_max, avg as spark_avg
+from pyspark.sql.functions import col, regexp_replace, to_date, when, lit, concat_ws, count as spark_count, min as spark_min, max as spark_max, avg as spark_avg
+from pyspark.sql.types import DoubleType, IntegerType
 import os
 import sys
-from pyspark.sql.types import DoubleType, IntegerType
 
 # ----------------------
 # 1. Initialize Spark
@@ -51,14 +51,14 @@ clean_df = df \
 # ----------------------
 print("\n🔍 Analyzing data quality and adding rejection reasons...")
 
-# Add failure reason columns for each validation rule
 validation_df = clean_df \
     .withColumn("missing_order_id", when(col("Order ID").isNull(), lit("Missing Order ID")).otherwise(lit(None))) \
     .withColumn("missing_customer_id", when(col("Customer ID").isNull(), lit("Missing Customer ID")).otherwise(lit(None))) \
     .withColumn("missing_order_date", when(col("Order Date").isNull(), lit("Missing Order Date")).otherwise(lit(None))) \
     .withColumn("missing_product_id", when(col("Product ID").isNull(), lit("Missing Product ID")).otherwise(lit(None))) \
     .withColumn("invalid_segment", when(~col("Segment").isin(["Consumer", "Corporate", "Home Office"]), 
-                                        concat_ws("", lit("Invalid Segment: "), col("Segment"))).otherwise(lit(None)))
+                                        concat_ws("", lit("Invalid Segment: "), col("Segment"))).otherwise(lit(None))) \
+    .withColumn("invalid_discount", when((col("Discount") < 0) | (col("Discount") > 1), lit("Invalid Discount")).otherwise(lit(None)))
 
 # Combine all failure reasons into a single column
 validation_df = validation_df.withColumn(
@@ -68,7 +68,8 @@ validation_df = validation_df.withColumn(
         col("missing_customer_id"), 
         col("missing_order_date"),
         col("missing_product_id"),
-        col("invalid_segment")
+        col("invalid_segment"),
+        col("invalid_discount")
     )
 )
 
@@ -84,7 +85,6 @@ validation_df = validation_df.withColumn(
 quality_df = validation_df.filter(col("is_rejected") == False)
 rejected_df = validation_df.filter(col("is_rejected") == True)
 
-# Count records
 quality_count = quality_df.count()
 rejected_count = rejected_df.count()
 
@@ -98,96 +98,57 @@ print(f"  ⚠️  Rejected records: {rejected_count:,} ({rejected_count/initial_
 # ----------------------
 if rejected_count > 0:
     print("\n📋 Rejection Breakdown:")
-    
-    # Count each rejection reason using PySpark
     rejection_summary = rejected_df.groupBy("rejection_reasons").agg(spark_count("*").alias("count")).orderBy(col("count").desc())
-    
-    # Collect and print results
-    rejection_rows = rejection_summary.collect()
-    for row in rejection_rows:
+    for row in rejection_summary.collect():
         print(f"  - {row['rejection_reasons']}: {row['count']} records")
 
 # ----------------------
-# 7. Show Sample of Clean Data
+# 7. Sample of Quality & Rejected Data
 # ----------------------
 print("\n📊 Sample of quality-validated data:")
-quality_df.select("Row ID", "Order ID", "Customer ID", "Product ID", "Segment", "Sales", "Profit").show(5)
+quality_df.select("Row ID", "Order ID", "Customer ID", "Product ID", "Segment", "Sales", "Profit", "Discount").show(5)
 
 if rejected_count > 0:
     print("\n⚠️  Sample of rejected data:")
-    rejected_df.select("Row ID", "Order ID", "Customer ID", "Segment", "rejection_reasons").show(5, truncate=False)
+    rejected_df.select("Row ID", "Order ID", "Customer ID", "Segment", "Discount", "rejection_reasons").show(5, truncate=False)
 
 # ----------------------
-# 8. DATA QUALITY REPORT (using PySpark)
+# 8. DATA QUALITY REPORT
 # ----------------------
 print("\n🔍 Running data quality validation report...")
 
-try:
-    print("\n📋 Data Quality Checks:")
-    
-    row_count = quality_count
-    
-    # All critical checks should pass now
-    print(f"  ✓ Row count check ({row_count:,} rows): PASS")
-    print(f"  ✓ Order ID not null: PASS (0 nulls)")
-    print(f"  ✓ Customer ID not null: PASS (0 nulls)")
-    print(f"  ✓ Product ID not null: PASS (0 nulls)")
-    print(f"  ✓ Segment values valid: PASS")
-    
-    # Warning-level checks using PySpark
-    sales_nulls = quality_df.filter(col("Sales").isNull()).count()
-    profit_nulls = quality_df.filter(col("Profit").isNull()).count()
-    print(f"  ⚠️  Sales: {sales_nulls} nulls (allowed)")
-    print(f"  ⚠️  Profit: {profit_nulls} nulls (allowed)")
-    
-    print("\n" + "="*60)
-    print("✅ CRITICAL DATA QUALITY CHECKS PASSED!")
-    print("="*60 + "\n")
-    
-    # Detailed summary using PySpark aggregations
-    unique_customers = quality_df.select("Customer ID").distinct().count()
-    unique_products = quality_df.select("Product ID").distinct().count()
-    
-    date_stats = quality_df.agg(
-        spark_min("Order Date").alias("min_date"),
-        spark_max("Order Date").alias("max_date")
-    ).collect()[0]
-    min_date = date_stats["min_date"]
-    max_date = date_stats["max_date"]
-    
-    sales_stats = quality_df.filter(col("Sales").isNotNull()).agg(
-        spark_min("Sales").alias("min_sales"),
-        spark_max("Sales").alias("max_sales"),
-        spark_avg("Sales").alias("avg_sales")
-    ).collect()[0]
-    
-    print("📊 Data Quality Summary:")
-    print(f"  - Total quality records: {row_count:,}")
-    print(f"  - Records rejected: {rejected_count:,}")
-    print(f"  - Data quality rate: {quality_count/initial_count*100:.2f}%")
-    print(f"  - Unique customers: {unique_customers:,}")
-    print(f"  - Unique products: {unique_products:,}")
-    print(f"  - Date range: {min_date} to {max_date}")
-    
-    if sales_stats["min_sales"] is not None:
-        print(f"\n  Sales Statistics:")
-        print(f"    - Min: ${sales_stats['min_sales']:.2f}")
-        print(f"    - Max: ${sales_stats['max_sales']:.2f}")
-        print(f"    - Mean: ${sales_stats['avg_sales']:.2f}")
-    
-    print(f"\n  Segment Distribution:")
-    segment_dist = quality_df.groupBy("Segment").agg(spark_count("*").alias("count")).collect()
-    for row in segment_dist:
-        seg_count = row['count']
-        print(f"    - {row['Segment']}: {seg_count:,} ({seg_count/row_count*100:.1f}%)")
-    
-    print()
+row_count = quality_count
+sales_nulls = quality_df.filter(col("Sales").isNull()).count()
+profit_nulls = quality_df.filter(col("Profit").isNull()).count()
 
-except Exception as e:
-    print(f"⚠️  Validation report error: {e}\n")
+print(f"  ⚠️  Sales nulls: {sales_nulls}")
+print(f"  ⚠️  Profit nulls: {profit_nulls}")
+
+unique_customers = quality_df.select("Customer ID").distinct().count()
+unique_products = quality_df.select("Product ID").distinct().count()
+
+date_stats = quality_df.agg(
+    spark_min("Order Date").alias("min_date"),
+    spark_max("Order Date").alias("max_date")
+).collect()[0]
+
+sales_stats = quality_df.filter(col("Sales").isNotNull()).agg(
+    spark_min("Sales").alias("min_sales"),
+    spark_max("Sales").alias("max_sales"),
+    spark_avg("Sales").alias("avg_sales")
+).collect()[0]
+
+print(f"\n📊 Data Quality Summary:")
+print(f"  - Total quality records: {row_count:,}")
+print(f"  - Records rejected: {rejected_count:,}")
+print(f"  - Data quality rate: {quality_count/initial_count*100:.2f}%")
+print(f"  - Unique customers: {unique_customers:,}")
+print(f"  - Unique products: {unique_products:,}")
+print(f"  - Date range: {date_stats['min_date']} to {date_stats['max_date']}")
+print(f"  - Sales: min ${sales_stats['min_sales']:.2f}, max ${sales_stats['max_sales']:.2f}, avg ${sales_stats['avg_sales']:.2f}")
 
 # ----------------------
-# 10. PostgreSQL Connection Setup
+# 9. PostgreSQL Connection Setup
 # ----------------------
 postgres_host = os.environ.get("POSTGRES_HOST", "warehouse-db")
 postgres_user = os.environ.get("POSTGRES_USER", "warehouse_user")
@@ -195,78 +156,39 @@ postgres_password = os.environ.get("POSTGRES_PASSWORD", "warehouse_pass")
 postgres_db = os.environ.get("POSTGRES_DB", "warehouse")
 
 jdbc_url = f"jdbc:postgresql://{postgres_host}:5432/{postgres_db}"
-properties = {
-    "user": postgres_user,
-    "password": postgres_password,
-    "driver": "org.postgresql.Driver"
-}
+properties = {"user": postgres_user, "password": postgres_password, "driver": "org.postgresql.Driver"}
 
 # ----------------------
-# 11. Load QUALITY Data into PostgreSQL
+# 10. Load QUALITY Data into PostgreSQL
 # ----------------------
-print("📦 Loading QUALITY-VALIDATED data into PostgreSQL (sales_data table)...")
-
 try:
-    # Drop the temporary validation columns before saving
     quality_final = quality_df.drop("missing_order_id", "missing_customer_id", 
                                     "missing_order_date", "missing_product_id", 
-                                    "invalid_segment", "rejection_reasons", "is_rejected")
-    
-    quality_final.write.jdbc(
-        url=jdbc_url,
-        table="sales_data",
-        mode="overwrite",
-        properties=properties
-    )
+                                    "invalid_segment", "invalid_discount",
+                                    "rejection_reasons", "is_rejected")
+    quality_final.write.jdbc(url=jdbc_url, table="sales_data", mode="overwrite", properties=properties)
     print(f"  ✅ Loaded {quality_count:,} quality records to 'sales_data' table")
 except Exception as e:
-    print(f"❌ Error writing quality data to PostgreSQL: {e}")
+    print(f"❌ Error writing quality data: {e}")
     spark.stop()
     sys.exit(1)
 
 # ----------------------
-# 12. Load REJECTED Data into PostgreSQL
+# 11. Load REJECTED Data into PostgreSQL
 # ----------------------
 if rejected_count > 0:
-    print("\n📦 Loading REJECTED data into PostgreSQL (sales_data_rejected table)...")
-    
-    try:
-        # Keep only necessary columns for rejected data
-        rejected_final = rejected_df.select(
-            "Row ID", "Order ID", "Order Date", "Ship Date", "Ship Mode",
-            "Customer ID", "Customer Name", "Segment", "Country/Region",
-            "City", "State", "Postal Code", "Region", "Product ID",
-            "Category", "Sub-Category", "Product Name", "Sales", 
-            "Quantity", "Discount", "Profit", "rejection_reasons"
-        )
-        
-        rejected_final.write.jdbc(
-            url=jdbc_url,
-            table="sales_data_rejected",
-            mode="overwrite",
-            properties=properties
-        )
-        print(f"  ✅ Loaded {rejected_count:,} rejected records to 'sales_data_rejected' table")
-        print(f"  📊 You can now analyze rejection reasons in Grafana/SQL!")
-    except Exception as e:
-        print(f"⚠️  Warning: Could not write rejected data to PostgreSQL: {e}")
-        print(f"  Rejected data is still available in HDFS")
-else:
-    print("\n🎉 No rejected records - all data passed quality checks!")
+    rejected_final = rejected_df.select(
+        "Row ID", "Order ID", "Order Date", "Ship Date", "Ship Mode",
+        "Customer ID", "Customer Name", "Segment", "Country/Region",
+        "City", "State", "Postal Code", "Region", "Product ID",
+        "Category", "Sub-Category", "Product Name", "Sales", 
+        "Quantity", "Discount", "Profit", "rejection_reasons"
+    )
+    rejected_final.write.jdbc(url=jdbc_url, table="sales_data_rejected", mode="overwrite", properties=properties)
+    print(f"  ✅ Loaded {rejected_count:,} rejected records to 'sales_data_rejected' table")
 
 # ----------------------
-# 13. Stop Spark
+# 12. Stop Spark
 # ----------------------
 spark.stop()
-print("\n✅ Pipeline completed successfully!\n")
-print("="*60)
-print("SUMMARY:")
-print(f"  - Input: {initial_count:,} records")
-print(f"  - Quality records → 'sales_data': {quality_count:,} ({quality_count/initial_count*100:.2f}%)")
-print(f"  - Rejected records → 'sales_data_rejected': {rejected_count:,} ({rejected_count/initial_count*100:.2f}%)")
-print("="*60)
-print("\n💡 Next Steps:")
-print("  1. Query rejected data: SELECT * FROM sales_data_rejected;")
-print("  2. Analyze rejection reasons: SELECT rejection_reasons, COUNT(*) FROM sales_data_rejected GROUP BY rejection_reasons;")
-print("  3. Create Grafana dashboard to visualize data quality metrics")
-print("="*60)
+print("\n✅ Pipeline completed successfully!")

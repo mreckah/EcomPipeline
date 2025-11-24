@@ -1,92 +1,87 @@
+import streamlit as st
 import pandas as pd
-import random
-import time
-import uuid
-from datetime import datetime, timedelta
+import numpy as np
+import joblib
 
-class DataStreamer:
-    def __init__(self, file_path, delay=5):
-        self.file_path = file_path
-        self.delay = delay
+st.set_page_config(page_title="Profit Prediction", layout="wide")
+st.title("💰 Profit Prediction App")
 
-        # Load base dataset
-        self.base_df = pd.read_csv(file_path)
+# ---------------------- Load model & metadata ----------------------
+model = joblib.load("./models/xgb_model.pkl")
+features = joblib.load("./models/feature_list.pkl")
+encoders = joblib.load("./models/encoders.pkl")
 
-        # Probabilities and mappings
-        self.ship_modes = self.base_df['Ship Mode'].unique().tolist()
-        self.segments = self.base_df['Segment'].unique().tolist()
-        self.countries = self.base_df['Country/Region'].unique().tolist()
-        self.categories = self.base_df['Category'].unique().tolist()
-        self.subcategories = self.base_df['Sub-Category'].unique().tolist()
+# ---------------------- Helpers ----------------------
+def parse_input_number(x):
+    if isinstance(x,(int,float)):
+        return float(x)
+    s = str(x).replace("$","").replace("(","").replace(")","").replace(" ","")
+    if '.' in s and ',' in s and s.rfind(',') > s.rfind('.'):
+        s = s.replace('.','').replace(',','.')
+    elif ',' in s and s.count(',') == 1 and len(s.split(',')[1]) <= 3:
+        s = s.replace(',','.')
+    else:
+        s = s.replace(',','')
+    try:
+        return float(s)
+    except:
+        raise ValueError(f"Cannot parse {x}")
 
-        # Compute frequencies (fallback if column missing)
-        if 'Product ID' in self.base_df.columns:
-            self.product_freq = self.base_df['Product ID'].value_counts(normalize=True)
-        else:
-            self.product_freq = pd.Series(dtype=float)
+def safe_encode(col,value):
+    le = encoders[col]
+    if str(value) not in list(le.classes_):
+        return int(0) # fallback
+    return int(le.transform([value])[0])
 
-        if 'Customer ID' in self.base_df.columns:
-            self.customer_freq = self.base_df['Customer ID'].value_counts(normalize=True)
-        else:
-            self.customer_freq = pd.Series(dtype=float)
+# ---------------------- Inputs ----------------------
+st.header("Enter Values")
+col1,col2,col3 = st.columns(3)
 
-        # Probabilities
-        self.new_customer_prob = 0.05
-        self.new_product_prob = 0.05
+with col1:
+    sales_raw = st.text_input("Sales ($)", "400.00")
+    quantity = st.number_input("Quantity", 1, step=1)
+    discount_raw = st.text_input("Discount (0.2=20%)","0.0")
 
-    def _random_customer(self):
-        """Pick existing or new customer."""
-        if len(self.customer_freq) > 0 and random.random() > self.new_customer_prob:
-            return random.choices(self.customer_freq.index, weights=self.customer_freq.values, k=1)[0]
-        return f"CUST-{uuid.uuid4().hex[:6]}"
+with col2:
+    ship_mode = st.selectbox("Ship Mode",list(encoders["Ship Mode"].classes_))
+    segment   = st.selectbox("Segment",list(encoders["Segment"].classes_))
+    category  = st.selectbox("Category",list(encoders["Category"].classes_))
 
-    def _random_product(self):
-        """Pick existing or new product."""
-        if len(self.product_freq) > 0 and random.random() > self.new_product_prob:
-            return random.choices(self.product_freq.index, weights=self.product_freq.values, k=1)[0]
-        return f"PROD-{uuid.uuid4().hex[:6]}"
+with col3:
+    sub_category = st.selectbox("Sub-Category",list(encoders["Sub-Category"].classes_))
+    region       = st.selectbox("Region",list(encoders["Region"].classes_))
+    order_month  = st.slider("Order Month",1,12,1)
 
-    def generate_row(self):
-        """Generate a new synthetic row similar to existing dataset."""
-        order_id = f"ORD-{uuid.uuid4().hex[:6]}"
-        order_date = datetime.now().strftime("%Y-%m-%d")
-        ship_date = (datetime.now() + timedelta(days=random.randint(1, 7))).strftime("%Y-%m-%d")
+# ---------------------- Parse inputs ----------------------
+sales = parse_input_number(sales_raw)
+d = float(discount_raw)
+if d>1: d=d/100
+discount=d
 
-        row = {
-            "Row ID": len(self.base_df) + 1,
-            "Order ID": order_id,
-            "Order Date": order_date,
-            "Ship Date": ship_date,
-            "Ship Mode": random.choice(self.ship_modes),
-            "Customer ID": self._random_customer(),
-            "Customer Name": f"Name-{random.randint(1, 1000)}",
-            "Segment": random.choice(self.segments),
-            "Country/Region": random.choice(self.countries),
-            "City": f"City-{random.randint(1, 500)}",
-            "State": f"State-{random.randint(1, 100)}",
-            "Postal Code": random.randint(10000, 99999),
-            "Region": random.choice(["East", "West", "Central", "South"]),
-            "Product ID": self._random_product(),
-            "Category": random.choice(self.categories),
-            "Sub-Category": random.choice(self.subcategories),
-            "Product Name": f"Product-{random.randint(1, 500)}",
-            "Sales": round(random.uniform(10, 500), 2),
-            "Quantity": random.randint(1, 10),
-            "Discount": round(random.uniform(0, 0.3), 2),
-            "Profit": round(random.uniform(-50, 200), 2)
-        }
-        return row
+# Encode categoricals
+ship_mode_enc = safe_encode("Ship Mode",ship_mode)
+segment_enc   = safe_encode("Segment",segment)
+category_enc  = safe_encode("Category",category)
+sub_category_enc = safe_encode("Sub-Category",sub_category)
+region_enc    = safe_encode("Region",region)
 
-    def stream(self):
-        """Continuously append rows to CSV file."""
-        while True:
-            row = self.generate_row()
-            new_df = pd.DataFrame([row])
-            new_df.to_csv(self.file_path, mode='a', header=False, index=False)
-            print(f"Added row: {row}")
-            time.sleep(self.delay)
+# ---------------------- Prepare DataFrame ----------------------
+input_df = pd.DataFrame([{
+    "Sales": sales,
+    "Quantity": quantity,
+    "Discount": discount,
+    "Order_Month": order_month,
+    "Ship Mode_Encoded": ship_mode_enc,
+    "Segment_Encoded": segment_enc,
+    "Category_Encoded": category_enc,
+    "Sub-Category_Encoded": sub_category_enc,
+    "Region_Encoded": region_enc
+}])[features]
 
-if __name__ == "__main__":
-    file_path = "./data/input/sales.csv"  # adjust path if needed
-    streamer = DataStreamer(file_path, delay=3)  # add new row every 3 sec
-    streamer.stream()
+# ---------------------- Prediction ----------------------
+if st.button("🔮 Predict Profit"):
+    pred = model.predict(input_df)[0]
+    margin_pct = pred/sales*100 if sales!=0 else np.nan
+
+    st.markdown("---")
+    st.metric("Predicted Profit", f"${pred:,.2f}", delta=f"{margin_pct:.1f}% margin")
