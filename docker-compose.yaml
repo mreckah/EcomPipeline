@@ -58,6 +58,7 @@ services:
       - ./spark-jobs:/opt/spark-jobs
       - ./gx:/opt/gx
       - ./data:/opt/data
+      - ./scripts:/opt/airflow/scripts
     restart: unless-stopped
     networks:
       - data-pipeline
@@ -77,6 +78,7 @@ services:
       - ./spark-jobs:/opt/spark-jobs
       - ./gx:/opt/gx
       - ./data:/opt/data
+      - ./scripts:/opt/airflow/scripts
     restart: unless-stopped
     networks:
       - data-pipeline
@@ -186,6 +188,160 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  
+    # ================= AIRFLOW =================
+  airflow-redis:
+    image: redis:latest
+    container_name: airflow-redis
+    restart: unless-stopped
+    networks:
+      - data-pipeline
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  airflow-postgres:
+    image: postgres:15
+    container_name: airflow-postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    restart: unless-stopped
+    volumes:
+      - airflow_db:/var/lib/postgresql/data
+    networks:
+      - data-pipeline
+
+  airflow-init:
+    image: apache/airflow:2.9.1
+    container_name: airflow-init
+    entrypoint: /bin/bash
+    command: >
+      -c "airflow db migrate &&
+          airflow users create --username admin --password admin --firstname Air --lastname Flow --role Admin --email admin@example.com || true"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: t3K5q9Nh8R_4sV2bX7uP1zL0aY6mC8wQ
+    user: "50000:50000"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./scripts:/opt/airflow/scripts
+    depends_on:
+      - airflow-postgres
+      - airflow-redis
+    networks:
+      - data-pipeline
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.1
+    container_name: airflow-scheduler
+    command: scheduler
+    restart: unless-stopped
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 300
+      AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: t3K5q9Nh8R_4sV2bX7uP1zL0aY6mC8wQ
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./scripts:/opt/airflow/scripts
+    depends_on:
+      - airflow-init
+    networks:
+      - data-pipeline
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 768M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  airflow-webserver:
+    image: apache/airflow:2.9.1
+    container_name: airflow-webserver
+    command: webserver
+    restart: unless-stopped
+    ports:
+      - "8081:8080"   # Airflow UI
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__WEBSERVER__WORKERS: 2
+      AIRFLOW__WEBSERVER__WORKER_CLASS: sync
+      AIRFLOW__WEBSERVER__TIMEOUT: 300
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      AIRFLOW__WEBSERVER__SECRET_KEY: t3K5q9Nh8R_4sV2bX7uP1zL0aY6mC8wQ
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./scripts:/opt/airflow/scripts
+    depends_on:
+      - airflow-init
+    networks:
+      - data-pipeline
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  airflow-worker:
+    image: apache/airflow:2.9.1
+    container_name: airflow-worker
+    command: celery worker
+    restart: unless-stopped
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://airflow-redis:6379/0
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-postgres/airflow
+      AIRFLOW__CELERY__WORKER_CONCURRENCY: 2
+      AIRFLOW__WEBSERVER__SECRET_KEY: t3K5q9Nh8R_4sV2bX7uP1zL0aY6mC8wQ
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./scripts:/opt/airflow/scripts
+    depends_on:
+      - airflow-init
+    networks:
+      - data-pipeline
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
 
 # ================= VOLUMES =================
 volumes:
@@ -200,6 +356,8 @@ volumes:
   nifi_conf:
   warehouse_data:
   grafana_data:
+  airflow_db:
+  airflow_dags:
 
 # ================= NETWORKS =================
 networks:

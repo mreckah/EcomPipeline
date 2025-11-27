@@ -3,9 +3,14 @@ import pandas as pd
 import joblib
 
 # ---------------------- Load model and features ----------------------
-model = joblib.load("./models/xgb_model.pkl")
-features = joblib.load("./models/feature_list.pkl")
-encoders = joblib.load("./models/encoders.pkl")
+@st.cache_resource
+def load_artifacts():
+    model = joblib.load("./models/xgb_model.pkl")
+    features = joblib.load("./models/feature_list.pkl")
+    encoders = joblib.load("./models/encoders.pkl")
+    return model, features, encoders
+
+model, features, encoders = load_artifacts()
 
 st.set_page_config(page_title="Profit Prediction", layout="wide")
 st.title("Profit Prediction App")
@@ -54,30 +59,34 @@ input_df = pd.DataFrame([input_data])
 
 # ---------------------- Prediction ----------------------
 if st.button("🔮 Predict Profit", type="primary"):
-    predicted_profit = model.predict(input_df[features])[0]
-    
-    st.markdown("---")
-    col1, col2, col3 = st.columns([1, 2, 1])
+    try:
+        predicted_profit = model.predict(input_df[features])[0]
+        
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
 
-    with col2:
-        st.metric(
-            label="Predicted Profit",
-            value=f"${predicted_profit:,.2f}",
-            delta=f"{(predicted_profit / sales * 100):.1f}% margin" if sales > 0 else "N/A"
-        )
+        with col2:
+            st.metric(
+                label="Predicted Profit",
+                value=f"${predicted_profit:,.2f}",
+                delta=f"{(predicted_profit / sales * 100):.1f}% margin" if sales > 0 else "N/A"
+            )
 
-    # ---------------------- Breakdown ----------------------
-    st.subheader("Calculation Breakdown")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric("Sales", f"${sales:,.2f}")
-        st.metric("Quantity", f"{quantity}")
+        # ---------------------- Breakdown ----------------------
+        st.subheader("Calculation Breakdown")
+        col1, col2, col3 = st.columns(3)
 
-    with col2:
-        st.metric("Discount", f"{discount*100:.1f}%")
-        st.metric("Order Month", f"{order_month}")
+        with col1:
+            st.metric("Sales", f"${sales:,.2f}")
+            st.metric("Quantity", f"{quantity}")
 
-    with col3:
-        st.metric("Segment", segment)
-        st.metric("Category", category)
+        with col2:
+            st.metric("Discount", f"{discount * 100:.1f}%")
+            st.metric("Order Month", f"{order_month}")
+
+        with col3:
+            st.metric("Segment", segment)
+            st.metric("Category", category)
+
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
